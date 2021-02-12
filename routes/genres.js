@@ -1,10 +1,8 @@
-const Joi = require('joi');
+const Joi = require('Joi');
 const express = require('express');
-const app = express();
+const routes = express.Router();
 
-// middleware
-app.use(express.json());
-
+// Data
 // data storage
 const genres = [
     {id: 1, name: 'Horror'},
@@ -14,30 +12,14 @@ const genres = [
     {id: 5, name: 'Fiction'}
 ];
 
-// get root - used for testing
-app.get('/', (req, res) => {
-    res.send('VIDLY Home Page');
-});
-
 // GET /api/genres/
-app.get('/api/genres', (req, res) => {
+routes.get('/', (req, res) => {
     // return the list of genres.
     res.send(genres);
 });
 
-// GET /api/genres/
-app.get('/api/genres/:id', (req, res) => {
-   
-    // search for the given genre.
-    const genre = genres.find(x => x.id === parseInt(req.params.id));
-    if (!genre) return res.status(404).send('The given genre ID was not found.');
-
-    // return the genre.
-    res.send(genre);
-}); 
-
 // POST /api/genres/
-app.post('/api/genres', (req, res) => {
+routes.post('/', (req, res) => {
     
     // validation.
     const { error } = validateGenre(req.body);
@@ -54,7 +36,7 @@ app.post('/api/genres', (req, res) => {
 });
 
 // PUT /api/genres
-app.put('/api/genres/:id', (req, res) => {
+routes.put('/:id', (req, res) => {
 
     // search for the given genre.
     const genre = genres.find(x => x.id === parseInt(req.params.id));
@@ -69,7 +51,7 @@ app.put('/api/genres/:id', (req, res) => {
 });
 
 // DELETE /api/genre
-app.delete('/api/genres/:id', (req, res) => {
+routes.delete('/:id', (req, res) => {
 
     // search
     const genre = genres.find(x => x.id === parseInt(req.params.id));
@@ -81,6 +63,17 @@ app.delete('/api/genres/:id', (req, res) => {
 
     res.send(genre);
 });
+
+// GET /api/genres/
+routes.get('/:id', (req, res) => {
+   
+    // search for the given genre.
+    const genre = genres.find(x => x.id === parseInt(req.params.id));
+    if (!genre) return res.status(404).send('The given genre ID was not found.');
+
+    // return the genre.
+    res.send(genre);
+}); 
 
 // Validation logic.
 function validateGenre(genre) {
@@ -94,5 +87,4 @@ function validateGenre(genre) {
     return Joi.validate(genre, schema);
 }
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}`));
+module.exports = routes;
